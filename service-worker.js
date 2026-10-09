@@ -79,7 +79,8 @@ async function getStatus() {
     updatedAt: stored.blocklistUpdatedAt || null,
     lastRefreshAttempt: stored.lastRefreshAttempt || null,
     error: stored.lastRefreshError || null,
-    domainCount: stored.blockedDomainCount || 0,\n    source: stored.blocklistSource || 'remote'
+    domainCount: stored.blockedDomainCount || 0,
+    source: stored.blocklistSource || 'remote'
   };
 }
 
