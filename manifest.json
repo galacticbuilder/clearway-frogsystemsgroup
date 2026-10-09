@@ -3,7 +3,7 @@
   "name": "Clearway — Education Web Filtering",
   "short_name": "Clearway",
   "description": "School-focused web filtering powered by the Clearway blocklist.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "minimum_chrome_version": "111",
   "permissions": [
     "storage",
@@ -11,7 +11,8 @@
     "declarativeNetRequest"
   ],
   "host_permissions": [
-    "https://raw.githubusercontent.com/galacticbuilder/clearway-frogsystemsgroup/*"
+    "https://raw.githubusercontent.com/galacticbuilder/clearway-frogsystemsgroup/*",
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "service-worker.js"
@@ -19,5 +20,19 @@
   "action": {
     "default_title": "Clearway filtering status",
     "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "page-filter.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "storage": {
+    "managed_schema": "managed_schema.json"
   }
 }
