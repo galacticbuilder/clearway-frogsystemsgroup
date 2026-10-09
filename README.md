@@ -57,7 +57,7 @@ Copyright © 2026 FrogSystems Group. All rights reserved. Unless a separate lice
 
 The Clearway visual identity is in `branding/clearway-logo.svg` and `branding/clearway-mark.svg`. The extension uses the mark in its popup and restriction page.
 
-The initial demonstration blocklist includes real public websites: `example.com`, `roblox.com`, `poki.com`, and `crazygames.com`. This is a demonstration configuration, not a recommended universal school policy. The YouTube setting is opt-in through administrator policy, not enabled in the central sample list.
+The initial demonstration blocklist includes `example.com`, `example.org`, and `roblox.com` so that domain matching can be tested against real, publicly reachable sites. This is a demonstration configuration, not a recommended universal school policy. Additional game sites (Poki and CrazyGames) and YouTube are opt-in through administrator policy. The central demo list is still enforced until you remove those entries from `blocklist.json`.
 
 See [Administrator policy guide](admin/README.md), [managed policy example](admin/policy-examples.json), and the [managed storage schema](managed_schema.json). The extension supports administrator-controlled domain rules, URL filters, URL keywords, optional YouTube/game-site switches, allow exceptions, and optional best-effort page text keyword checks.
 
