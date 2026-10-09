@@ -62,3 +62,12 @@ The initial demonstration blocklist includes `example.com`, `example.org`, and `
 See [Administrator policy guide](admin/README.md), [managed policy example](admin/policy-examples.json), and the [managed storage schema](managed_schema.json). The extension supports administrator-controlled domain rules, URL filters, URL keywords, optional YouTube/game-site switches, allow exceptions, and optional best-effort page text keyword checks.
 
 For browser-native URL blocking independent of Clearway, see `admin/native-urlblocklist-examples.md`. Native URL block policies typically show a browser-managed block page rather than Clearway branding.
+
+
+## Organisation-specific filtering
+
+ClearWay policies are configured separately for each organisation through Chrome/Edge managed extension storage. Available controls include selected categories, HTTPS category feeds, optional category lookup API, organisation blacklist and whitelist, URL keywords, category-specific page keywords, and independent YouTube controls (whole-site blocking or selected video IDs).
+
+See [the administrator guide](admin/README.md), [policy example](admin/policy-examples.json), and [category feed format example](admin/category-feed-example.json).
+
+**Category source limitation:** ClearWay does not include a commercial or comprehensive domain categorisation database. Administrators must configure a licensed/public category feed in the documented JSON format or operate a category lookup API. API checks run after navigation begins and fail open if the endpoint is unavailable. For robust pre-navigation blocking, other browsers and apps, use managed DNS or a secure web gateway alongside the extension.
