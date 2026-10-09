@@ -182,10 +182,17 @@ async function installRules(blocklist, policy) {
     // demo list is used only when no organisation-specific policy is configured.
     const organisationPolicyConfigured = Boolean(
       policy.organizationName ||
+      policy.blockYouTube === true ||
+      policy.blockYouTubeEntirely === true ||
+      policy.blockGames === true ||
       (Array.isArray(policy.enabledCategories) && policy.enabledCategories.length) ||
       (Array.isArray(policy.categoryFeedUrls) && policy.categoryFeedUrls.length) ||
       (Array.isArray(policy.blacklistDomains) && policy.blacklistDomains.length) ||
-      (Array.isArray(policy.whitelistDomains) && policy.whitelistDomains.length)
+      (Array.isArray(policy.whitelistDomains) && policy.whitelistDomains.length) ||
+      (Array.isArray(policy.blockedKeywords) && policy.blockedKeywords.length) ||
+      (Array.isArray(policy.blockedUrlKeywords) && policy.blockedUrlKeywords.length) ||
+      (Array.isArray(policy.blockedUrlFilters) && policy.blockedUrlFilters.length) ||
+      (Array.isArray(policy.blockedYouTubeVideoIds) && policy.blockedYouTubeVideoIds.length)
     );
     const blockedDomains = new Set([
       ...normaliseDomainList(policy.blockDomains || []),
@@ -265,7 +272,8 @@ async function refreshBlocklist() {
       blocklistVersion: payload.version,
       blocklistUpdatedAt: payload.updatedAt || new Date().toISOString(),
       blockedDomainCount: payload.domains.length,
-      lastRefreshError: null
+      lastRefreshError: null,
+      blocklistSource: 'remote'
     });
     return { success: true, version: payload.version, domainCount: payload.domains.length };
   } catch (error) {
