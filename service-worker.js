@@ -74,7 +74,7 @@ async function getStatus() {
   return {
     enabled,
     managed: typeof policy.filteringEnabled === 'boolean',
-    blockYouTube: policy.blockYouTube === true,
+    blockYouTube: policy.blockYouTube === true || policy.blockYouTubeEntirely === true,
     blockGames: policy.blockGames === true,
     version: stored.blocklistVersion || 'Not downloaded',
     updatedAt: stored.blocklistUpdatedAt || null,
