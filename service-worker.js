@@ -64,7 +64,7 @@ async function getManagedPolicy() {
 async function getStatus() {
   const stored = await chrome.storage.local.get([
     'clearwayEnabled', 'blocklistVersion', 'blocklistUpdatedAt',
-    'lastRefreshAttempt', 'lastRefreshError', 'blockedDomainCount'
+    'lastRefreshAttempt', 'lastRefreshError', 'blockedDomainCount', 'blocklistSource'
   ]);
   const policy = await getManagedPolicy();
   const enabled = typeof policy.filteringEnabled === 'boolean'
@@ -79,7 +79,7 @@ async function getStatus() {
     updatedAt: stored.blocklistUpdatedAt || null,
     lastRefreshAttempt: stored.lastRefreshAttempt || null,
     error: stored.lastRefreshError || null,
-    domainCount: stored.blockedDomainCount || 0
+    domainCount: stored.blockedDomainCount || 0,\n    source: stored.blocklistSource || 'remote'
   };
 }
 
@@ -187,9 +187,32 @@ async function refreshBlocklist() {
     });
     return { success: true, version: payload.version, domainCount: payload.domains.length };
   } catch (error) {
-    await chrome.storage.local.set({ lastRefreshError: String(error && error.message || error) });
-    try { await applyCachedBlocklist(); } catch (_) {}
-    return { success: false, error: String(error && error.message || error) };
+    const remoteError = String(error && error.message || error);
+    // The repository may be private or the remote endpoint may be unavailable.
+    // Fall back to the blocklist packaged with the extension so first-run installs
+    // can still apply the included demo list without GitHub authentication.
+    try {
+      const bundledResponse = await fetch(chrome.runtime.getURL('blocklist.json'), { cache: 'no-store' });
+      if (!bundledResponse.ok) throw new Error('Bundled blocklist returned HTTP ' + bundledResponse.status + '.');
+      const payload = validateBlocklist(await bundledResponse.json());
+      const policy = await getManagedPolicy();
+      const settings = await chrome.storage.local.get(['clearwayEnabled']);
+      if (typeof policy.filteringEnabled !== 'boolean') policy.filteringEnabled = settings.clearwayEnabled !== false;
+      await installRules(payload, policy);
+      await chrome.storage.local.set({
+        blocklist: payload,
+        blocklistVersion: payload.version,
+        blocklistUpdatedAt: payload.updatedAt || new Date().toISOString(),
+        blockedDomainCount: payload.domains.length,
+        lastRefreshError: null,
+        blocklistSource: 'bundled'
+      });
+      return { success: true, version: payload.version, domainCount: payload.domains.length, source: 'bundled', warning: 'Using the blocklist included with Clearway. Remote refresh failed: ' + remoteError };
+    } catch (fallbackError) {
+      await chrome.storage.local.set({ lastRefreshError: remoteError + ' Bundled fallback failed: ' + String(fallbackError && fallbackError.message || fallbackError) });
+      try { await applyCachedBlocklist(); } catch (_) {}
+      return { success: false, error: remoteError };
+    }
   }
 }
 
