@@ -21,10 +21,15 @@ function render(status) {
     return;
   }
   enabledToggle.checked = status.enabled !== false;
-  $('filter-state').textContent = status.enabled === false ? 'Paused' : 'Active';
+  enabledToggle.disabled = status.managed === true;
+  enabledToggle.title = status.managed ? 'Managed by your school administrator' : 'Enable or pause filtering';
+  $('filter-state').textContent = status.managed ? (status.enabled === false ? 'Disabled by administrator' : 'Managed by administrator') : (status.enabled === false ? 'Paused' : 'Active');
   $('status-dot').className = 'status-dot ' + (status.enabled === false ? 'off' : 'on');
   $('domain-count').textContent = Number(status.domainCount || 0).toLocaleString();
   $('version').textContent = status.version || 'Not downloaded';
+  if (status.managed && (status.blockYouTube || status.blockGames)) {
+    $('message').textContent = 'School policy: ' + [status.blockYouTube ? 'YouTube' : '', status.blockGames ? 'game sites' : ''].filter(Boolean).join(' and ') + ' restrictions enabled.';
+  }
   $('updated').textContent = formatDate(status.updatedAt);
   if (status.error) showError('Update failed: ' + status.error + '. The last saved list remains in use.');
   else showError('');
