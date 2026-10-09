@@ -1,0 +1,10 @@
+Windows Registry Editor Version 5.00
+
+; Example only. Review and merge with your existing Edge policies.
+; Group Policy name: Configure the list of blocked URLs (URLBlocklist).
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge\URLBlocklist]
+"1"="youtube.com"
+"2"="[*.]youtube.com"
+"3"="youtu.be"
+"4"="[*.]youtube-nocookie.com"
