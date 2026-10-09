@@ -333,6 +333,22 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   (async () => {
     if (message?.type === 'GET_STATUS') return getStatus();
     if (message?.type === 'REFRESH_BLOCKLIST') return refreshBlocklist();
+    if (message?.type === 'CATEGORY_LOOKUP' && typeof message.domain === 'string') {
+      const domain = normaliseDomain(message.domain);
+      const policy = await getManagedPolicy();
+      if (typeof policy.categoryLookupApiUrl !== 'string' || !policy.categoryLookupApiUrl.trim()) return { blocked: false };
+      const endpoint = new URL(policy.categoryLookupApiUrl.trim());
+      if (endpoint.protocol !== 'https:') return { blocked: false };
+      endpoint.searchParams.set('domain', domain);
+      const response = await fetch(endpoint.href, { cache: 'no-store', credentials: 'omit' });
+      if (!response.ok) return { blocked: false };
+      const result = await response.json();
+      return {
+        blocked: result?.blocked === true,
+        category: typeof result?.category === 'string' ? result.category.slice(0, 80) : '',
+        reason: typeof result?.reason === 'string' ? result.reason.slice(0, 240) : ''
+      };
+    }
     if (message?.type === 'SET_ENABLED' && typeof message.enabled === 'boolean') {
       const policy = await getManagedPolicy();
       if (typeof policy.filteringEnabled === 'boolean') {
