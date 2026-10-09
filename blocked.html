@@ -1,26 +1,69 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GB">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <title>Website restricted — Clearway</title>
+  <meta name="theme-color" content="#155d48">
+  <title>Access restricted | ClearWay</title>
   <link rel="stylesheet" href="blocked.css">
 </head>
 <body>
-  <main class="panel">
-    <div class="brand"><img class="brand-logo" src="branding/clearway-mark.svg" alt=""><span>Clearway</span></div>
-    <div class="rule"></div>
-    <p class="eyebrow">EDUCATION WEB FILTERING</p>
-    <h1>This website is restricted</h1>
-    <p class="intro">Clearway has blocked this destination under your organisation’s web filtering policy.</p>
-    <section class="details" aria-live="polite">
-      <div class="detail-label">Restricted address</div>
-      <div id="destination" class="destination">Address unavailable</div>
+  <header class="topbar">
+    <div class="brand">
+      <img src="branding/clearway-mark.svg" alt="" class="brand-mark">
+      <span class="brand-name">Clear<span>Way</span></span>
+      <span class="brand-divider" aria-hidden="true"></span>
+      <span class="brand-product">Web filtering</span>
+    </div>
+    <div class="managed-label"><span class="managed-dot"></span> Organisation policy</div>
+  </header>
+
+  <main class="layout">
+    <section class="notice" aria-labelledby="page-title">
+      <div class="notice-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none"><path d="M24 4.5 41 11v11.2c0 10.2-6.8 17.1-17 21.3C13.8 39.3 7 32.4 7 22.2V11L24 4.5Z" stroke="currentColor" stroke-width="2.4"/><path d="M24 15v11M24 33h.02" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg>
+      </div>
+      <p class="kicker">WEBSITE ACCESS CONTROL</p>
+      <h1 id="page-title">This website has been blocked</h1>
+      <p class="lead">Your organisation’s ClearWay web-filtering policy does not allow access to this website.</p>
+
+      <div class="details">
+        <div class="detail-row">
+          <span class="detail-label">Website</span>
+          <span id="destination" class="detail-value url-value">Address unavailable</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Category</span>
+          <span id="category" class="detail-value"><span class="pill">Organisation policy</span></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Reason</span>
+          <span id="reason" class="detail-value">This address matches a restriction configured by your organisation.</span>
+        </div>
+      </div>
+
+      <div class="next-step">
+        <div class="next-icon" aria-hidden="true">i</div>
+        <div>
+          <h2>Think this is a mistake?</h2>
+          <p>If this website is needed for a lesson or work, ask your teacher or IT support team to review the restriction. Include the website address and what you need it for.</p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="back-button" class="primary-button" type="button">Go back</button>
+        <a id="support-link" class="secondary-button" href="#" hidden>Contact IT support</a>
+      </div>
+      <p id="back-hint" class="back-hint" aria-live="polite"></p>
     </section>
-    <p class="help">If you believe this website should be available for learning, contact your teacher or school IT team and ask them to review the restriction.</p>
-    <button id="back-button" type="button">Return to the previous page</button>
-    <footer>Clearway <span aria-hidden="true">·</span> A FrogSystems Group product</footer>
+
+    <footer class="footer">
+      <span>Protected by <strong>ClearWay</strong></span>
+      <span class="footer-separator" aria-hidden="true">·</span>
+      <span id="organisation">A FrogSystems Group product</span>
+      <span class="footer-right">If you believe access should be permitted, request a review.</span>
+    </footer>
   </main>
   <script src="blocked.js"></script>
 </body>
