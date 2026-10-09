@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "version": "example-categories-1",
+  "updatedAt": "2026-10-09T00:00:00Z",
+  "categories": {
+    "games": [
+      "example.com"
+    ],
+    "social-media": [
+      "example.org"
+    ],
+    "gambling": []
+  }
+}
