@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clearway</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <div class="brand-mark" aria-hidden="true">C</div>
+    <div><div class="brand-name">Clearway</div><div class="brand-subtitle">Education Web Filtering</div></div>
+    <span id="status-dot" class="status-dot" aria-hidden="true"></span>
+  </header>
+  <main>
+    <section class="status-row">
+      <div><div class="label">Filtering</div><div id="filter-state" class="value">Checking status…</div></div>
+      <label class="switch" aria-label="Enable or disable filtering"><input id="enabled" type="checkbox"><span class="slider"></span></label>
+    </section>
+    <section class="stat-grid">
+      <div class="stat"><div class="label">Blocked domains</div><div id="domain-count" class="stat-value">—</div></div>
+      <div class="stat"><div class="label">Blocklist version</div><div id="version" class="stat-value version">—</div></div>
+    </section>
+    <section class="update-section">
+      <div class="label">Last successful update</div>
+      <div id="updated" class="update-value">Not yet downloaded</div>
+      <div id="message" class="message" role="status"></div>
+      <button id="refresh" type="button">Update blocklist</button>
+    </section>
+  </main>
+  <footer>A FrogSystems Group product</footer>
+  <script src="popup.js"></script>
+</body>
+</html>
