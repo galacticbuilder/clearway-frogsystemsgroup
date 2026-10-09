@@ -120,7 +120,10 @@ async function refreshBlocklist() {
 }
 
 chrome.runtime.onInstalled.addListener(async () => {
-  await chrome.storage.local.set({ clearwayEnabled: true });
+  const existingSettings = await chrome.storage.local.get(['clearwayEnabled']);
+  if (typeof existingSettings.clearwayEnabled !== 'boolean') {
+    await chrome.storage.local.set({ clearwayEnabled: true });
+  }
   chrome.alarms.create(REFRESH_ALARM, { periodInMinutes: 60 });
   await refreshBlocklist();
 });
