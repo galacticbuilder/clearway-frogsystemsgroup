@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 96" role="img" aria-labelledby="title desc">
+  <title id="title">Clearway by FrogSystems Group</title>
+  <desc id="desc">A green shield with a clear path, followed by the Clearway wordmark.</desc>
+  <rect x="2" y="2" width="92" height="92" rx="21" fill="#176b4b"/>
+  <path d="M48 15 73 25v21c0 17-10 29-25 38C33 75 23 63 23 46V25z" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M31 51h13l7-13h11" fill="none" stroke="#b9f0cf" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="31" cy="51" r="3.5" fill="#fff"/><circle cx="62" cy="38" r="3.5" fill="#fff"/>
+  <text x="112" y="52" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="700" letter-spacing="-1.5" fill="#20352b">Clearway</text>
+  <text x="114" y="76" font-family="Arial, Helvetica, sans-serif" font-size="12" letter-spacing="1.2" fill="#607268">FROGSYSTEMS GROUP</text>
+</svg>
