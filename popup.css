@@ -2,7 +2,7 @@
 *{box-sizing:border-box}
 body{margin:0;width:330px}
 header{display:flex;align-items:center;gap:10px;padding:17px 18px;border-bottom:1px solid #e7ece8}
-.brand-mark{width:34px;height:34px;border-radius:9px;background:#176b4b;color:#fff;display:grid;place-items:center;font-weight:700;font-size:19px}
+.brand-mark{width:34px;height:34px;display:block;flex:0 0 34px}
 .brand-name{font-weight:700;font-size:16px;letter-spacing:-.3px}
 .brand-subtitle{font-size:11px;color:#6a7a70;margin-top:3px}
 .status-dot{width:8px;height:8px;border-radius:50%;background:#9aa79e;margin-left:auto}
