@@ -123,6 +123,14 @@
       },
       "title": "Blocked YouTube video IDs",
       "description": "Blocks specific YouTube videos by video ID, including watch, shorts and youtu.be URLs."
+    },
+    "categoryKeywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Category-specific page keywords",
+      "description": "Entries formatted category|keyword; applied only when that category is enabled."
     }
   }
 }
