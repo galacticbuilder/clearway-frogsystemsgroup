@@ -153,16 +153,16 @@ function youtubeVideoRules(videoIds) {
     .map((id) => id.trim())
     .filter((id) => /^[A-Za-z0-9_-]{6,20}$/.test(id)))].slice(0, 400);
   ids.forEach((id, index) => {
-    const patterns = ['*youtube.com/watch?v=' + id + '*', '*youtube.com/shorts/' + id + '*', '*youtu.be/' + id + '*'];
+    const patterns = ['*youtube.com/watch?v=' + id + '*', '*youtube.com/watch*&v=' + id + '*', '*youtube.com/shorts/' + id + '*', '*youtu.be/' + id + '*', '*youtube-nocookie.com/embed/' + id + '*'];
     patterns.forEach((pattern, patternIndex) => {
       rules.push({
-        id: RULE_ID_YOUTUBE + index * 6 + patternIndex * 2,
+        id: RULE_ID_YOUTUBE + index * 10 + patternIndex * 2,
         priority: 5,
         action: { type: 'redirect', redirect: { extensionPath: '/' + BLOCKED_PAGE } },
         condition: { urlFilter: pattern, resourceTypes: ['main_frame'] }
       });
       rules.push({
-        id: RULE_ID_YOUTUBE + index * 6 + patternIndex * 2 + 1,
+        id: RULE_ID_YOUTUBE + index * 10 + patternIndex * 2 + 1,
         priority: 4,
         action: { type: 'block' },
         condition: { urlFilter: pattern, resourceTypes: NON_DOCUMENT_TYPES }
