@@ -37,5 +37,6 @@
   "blockYouTubeEntirely": false,
   "blockedYouTubeVideoIds": [
     "EXAMPLE_ID_123"
-  ]
+  ],
+  "categoryLookupApiUrl": "https://filtering.example.edu/api/category-lookup"
 }
