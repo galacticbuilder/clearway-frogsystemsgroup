@@ -61,6 +61,5 @@
       "title": "Blocked page text keywords",
       "description": "Text checked in page title, headings and an initial body text sample."
     }
-  },
-  "additionalProperties": false
+  }
 }
