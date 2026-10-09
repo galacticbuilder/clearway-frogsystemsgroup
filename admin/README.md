@@ -1,49 +1,51 @@
-# Clearway administrator policy guide
+# ClearWay administrator policy guide
 
-Clearway supports browser extension managed storage policies through `storage.managed`. The schema is in `managed_schema.json`; example policy values are in `policy-examples.json`.
+ClearWay supports organisation-specific managed storage policies for Chrome and Edge. Configure a separate policy for each school/organisation through its managed browser deployment. Do not use one shared configuration when schools need different restrictions.
 
-## Supported controls
+## Per-organisation controls
 
-- `filteringEnabled`: enable or disable Clearway filtering (managed policy takes precedence over the popup).
-- `blockYouTube`: block YouTube and its subdomains.
-- `blockGames`: block the demo game domains in the service worker.
-- `blockDomains`: extra domains, including `*.example.org` (domain matching covers the apex and subdomains).
-- `allowDomains`: domain exceptions, higher priority than domain and URL blocks.
-- `blockedUrlFilters`: Declarative Net Request URL filter expressions, e.g. `||youtube.com/shorts/`.
-- `blockedUrlKeywords`: text matched in the URL itself, e.g. `unblocked-games`. This does not scan page body text.
-- `enablePageKeywordBlocking` + `pageKeywords`: best-effort page text inspection; when a term is found in title, headings, URL or the initial body text sample, Clearway displays a restriction overlay. It can produce false positives and is not tamper-proof.
+- `organizationName`, `supportUrl`: branding and support link shown on the restriction page.
+- `enabledCategories`: category keys selected by the school, for example `games`, `gambling`, `social-media`, `adult`, `streaming`, `anonymisers`, `malware`.
+- `categoryFeedUrls`: HTTPS JSON feeds. Each feed uses `{ "schemaVersion": 1, "categories": { "games": ["games.example"], "gambling": ["casino.example"] } }`. Only categories in `enabledCategories` are added to the block rules. See [category-feed-example.json](category-feed-example.json).
+- `categoryLookupApiUrl`: optional HTTPS API endpoint called after a page begins loading. ClearWay sends only the hostname as a `domain` query parameter. Return JSON such as `{ "blocked": true, "category": "games", "reason": "Games category is restricted" }`. The returned category must be present in `enabledCategories`. This is best-effort page-level enforcement, not a pre-navigation network block; API errors fail open.
+- `blacklistDomains` / `blockDomains`: organisation-specific domain blacklist. Entries may be `example.org` or `*.example.org`.
+- `whitelistDomains` / `allowDomains`: organisation-specific exceptions. These have higher rule priority than ClearWay's domain and URL rules.
+- `blockedKeywords` / `blockedUrlKeywords`: keywords matched against URLs, not page text.
+- `categoryKeywords`: page-text rules formatted as `category|keyword`. A rule is enabled only when its category is selected.
+- `pageKeywords` with `enablePageKeywordBlocking`: best-effort inspection of title, headings, URL and an initial body-text sample. It may produce false positives and can be bypassed by page changes.
+- `blockYouTubeEntirely`: separate switch for blocking YouTube (and its common short-link/embed domains).
+- `blockedYouTubeVideoIds`: selectively blocks listed video IDs in YouTube watch, Shorts and youtu.be URLs when entire-YouTube blocking is off.
+- `blockYouTube`: legacy compatibility switch; prefer `blockYouTubeEntirely`.
+- `blockGames`: convenience switch for the built-in Roblox, Poki and CrazyGames domains.
 
-## Managed storage policy deployment
+When an organisation policy is configured using organisation/category/list fields, ClearWay does not merge the demonstration `blocklist.json` domains into that organisation's policy. With no organisation policy configured, the bundled/central list is used as a development fallback.
 
-Chrome and Edge extension IDs are assigned by the browser store or by the extension's packaging/signing process. A locally loaded unpacked extension may have a different ID on each machine, so do not deploy a registry policy until you know the stable extension ID.
+## Category feeds and data sources
 
-### Chrome (Windows)
+The category feed is a simple integration format, not a supplied commercial classification database. Point `categoryFeedUrls` at a source you operate or are licensed to use. Feed providers may have different terms, update cadences, formats and coverage; convert them to ClearWay's JSON format before use. The example feed contains demonstration domains only.
 
-For a packaged/published extension, configure managed storage under:
+For an API lookup, the endpoint must be implemented and operated by your organisation or filtering provider. ClearWay does not ship a categorisation API or a massive licensed domain database. Since the extension's API lookup occurs after the page starts loading, use a managed DNS filter, secure web gateway or endpoint filtering agent for reliable pre-navigation enforcement and for browsers/apps outside the extension.
 
-`HKLM\Software\Policies\Google\Chrome\3rdparty\extensions\<EXTENSION_ID>\policy`
+## Chrome and Edge managed policy deployment
 
-The Chrome policy system expects values that match `managed_schema.json`. Use the supported Chrome ADMX/Cloud Management mechanisms for your organisation and verify the result at `chrome://policy`.
+Chrome and Edge extension IDs are assigned by the store or packaging/signing process. A locally loaded unpacked extension may have a different ID on each machine; do not deploy registry policies until you know the stable extension ID.
 
-### Microsoft Edge (Windows)
+Chrome managed storage is configured under:
 
-Use:
+`HKLM\\Software\\Policies\\Google\\Chrome\\3rdparty\\extensions\\<EXTENSION_ID>\\policy`
 
-`HKLM\Software\Policies\Microsoft\Edge\3rdparty\extensions\<EXTENSION_ID>\policy`
+Edge managed storage is configured under:
 
-Verify browser policies at `edge://policy`.
+`HKLM\\Software\\Policies\\Microsoft\\Edge\\3rdparty\\extensions\\<EXTENSION_ID>\\policy`
 
-### Group Policy extension deployment
+Use the browser's ADMX/enterprise management mechanism and verify policy application at `chrome://policy` or `edge://policy`. Force-install the extension through the appropriate extension management policy on school-managed devices. Local unpacked installs are for development, not production rollout.
 
-Use the browser's extension management policy to force-install the Clearway extension on managed devices. In Chrome this is normally managed through the Chrome ADMX policy `ExtensionInstallForcelist`; Edge uses its corresponding `ExtensionInstallForcelist` policy or `ExtensionSettings` with `installation_mode: force_installed`. For store-hosted extensions, use the store's published extension ID and official update URL. A local unpacked extension is for development, not production rollout.
+See [Chrome managed storage](https://developer.chrome.com/docs/extensions/reference/api/storage#property-managed) and Microsoft's [Edge extension management guide](https://learn.microsoft.com/en-us/deployedge/microsoft-edge-manage-extensions-ref-guide).
 
-For Edge's `ExtensionSettings` JSON, see Microsoft's [official guide](https://learn.microsoft.com/en-us/deployedge/microsoft-edge-manage-extensions-ref-guide). For Chrome's managed storage schema, see [Chrome extension storage documentation](https://developer.chrome.com/docs/extensions/reference/api/storage#property-managed).
+## Deployment and privacy notes
 
-## Important deployment notes
-
-- This repository's `policy-examples.json` is the logical policy object. It is not the same as the browser-wide `ExtensionSettings` object used to force-install extensions.
-- The sample `.reg` files are templates. Replace the placeholder extension ID and review registry data types before deployment. `clearway-gpo-example.reg` demonstrates Chrome managed storage; `clearway-edge-policy-example.reg` demonstrates the equivalent Edge policy path.
-- `blockDomains`, `allowDomains`, URL filters and keywords are browser extension policies, not native browser URLBlocklist policies.
-- Native Chrome/Edge URL blocklist policies can block host/path patterns independently of Clearway and may display a browser-native block page rather than Clearway branding.
-- Keyword/page-content checks are not equivalent to full category filtering. For reliable school-wide controls, pair the extension with managed DNS, endpoint or gateway filtering.
-- Keep an allowlist for essential learning platforms and test with a small pilot group before broad rollout.
+- Each organisation should receive its own policy and category feed/API configuration.
+- The API lookup sends the visited hostname to the configured endpoint. Make this clear in your privacy notice and ensure the endpoint is authorised and protected appropriately.
+- Never put API secrets in extension-managed settings that are readable by client-side extension code. Prefer an authenticated gateway or a narrowly scoped endpoint.
+- Test allowlist precedence carefully: a whitelisted domain bypasses ClearWay domain and URL rules for that domain.
+- Use a pilot group before wider rollout. The current browser extension has not been validated as a complete secure web gateway.
