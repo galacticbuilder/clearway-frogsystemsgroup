@@ -51,3 +51,14 @@ The extension's DNR rules are browser-enforced while the extension is installed 
 ## Licence
 
 Copyright © 2026 FrogSystems Group. All rights reserved. Unless a separate licence is provided, this repository is not licensed for redistribution or commercial reuse.
+
+
+## Branding and organisation policies
+
+The Clearway visual identity is in `branding/clearway-logo.svg` and `branding/clearway-mark.svg`. The extension uses the mark in its popup and restriction page.
+
+The initial demonstration blocklist includes real public websites: `example.com`, `roblox.com`, `poki.com`, and `crazygames.com`. This is a demonstration configuration, not a recommended universal school policy. The YouTube setting is opt-in through administrator policy, not enabled in the central sample list.
+
+See [Administrator policy guide](admin/README.md), [managed policy example](admin/policy-examples.json), and the [managed storage schema](managed_schema.json). The extension supports administrator-controlled domain rules, URL filters, URL keywords, optional YouTube/game-site switches, allow exceptions, and optional best-effort page text keyword checks.
+
+For browser-native URL blocking independent of Clearway, see `admin/native-urlblocklist-examples.md`. Native URL block policies typically show a browser-managed block page rather than Clearway branding.
