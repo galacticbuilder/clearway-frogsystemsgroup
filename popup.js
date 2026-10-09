@@ -32,6 +32,7 @@ function render(status) {
     ? 'School policy: ' + [status.blockYouTube ? 'YouTube' : '', status.blockGames ? 'game sites' : ''].filter(Boolean).join(' and ') + ' restrictions enabled.'
     : '';
   if (status.error) showError('Update failed: ' + status.error + '. The last saved list remains in use.');
+  else if (status.source === 'bundled') showError('Using the blocklist packaged with this extension. Remote updates are unavailable; update Clearway to receive blocklist changes.');
   else showError(policySummary);
 }
 
