@@ -119,10 +119,11 @@ async function installRules(blocklist, policy) {
   const rules = [];
 
   if (enabled) {
-    const blockedDomains = new Set(blocklist.domains);
-    normaliseDomainList(policy.blockDomains || []).forEach((domain) => blockedDomains.add(domain));
+    // Administrator-defined rules take precedence if the central list is at its size limit.
+    const blockedDomains = new Set(normaliseDomainList(policy.blockDomains || []));
     if (policy.blockYouTube === true) YOUTUBE_DOMAINS.forEach((domain) => blockedDomains.add(domain));
     if (policy.blockGames === true) GAME_DOMAINS.forEach((domain) => blockedDomains.add(domain));
+    blocklist.domains.forEach((domain) => blockedDomains.add(domain));
 
     [...blockedDomains].slice(0, MAX_DOMAINS).forEach((domain, index) => {
       const base = RULE_ID_DOMAIN + index * 2;
