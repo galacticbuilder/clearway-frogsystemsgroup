@@ -42,7 +42,7 @@ For Edge's `ExtensionSettings` JSON, see Microsoft's [official guide](https://le
 ## Important deployment notes
 
 - This repository's `policy-examples.json` is the logical policy object. It is not the same as the browser-wide `ExtensionSettings` object used to force-install extensions.
-- The sample `.reg` file is a template. Replace the placeholder extension ID and review registry data types before deployment. The file currently demonstrates the Chrome registry path only; the comments show the Edge equivalent.
+- The sample `.reg` files are templates. Replace the placeholder extension ID and review registry data types before deployment. `clearway-gpo-example.reg` demonstrates Chrome managed storage; `clearway-edge-policy-example.reg` demonstrates the equivalent Edge policy path.
 - `blockDomains`, `allowDomains`, URL filters and keywords are browser extension policies, not native browser URLBlocklist policies.
 - Native Chrome/Edge URL blocklist policies can block host/path patterns independently of Clearway and may display a browser-native block page rather than Clearway branding.
 - Keyword/page-content checks are not equivalent to full category filtering. For reliable school-wide controls, pair the extension with managed DNS, endpoint or gateway filtering.
