@@ -23,17 +23,15 @@
     try {
       const endpoint = new URL(apiEndpoint);
       if (endpoint.protocol === 'https:') {
-        endpoint.searchParams.set('domain', location.hostname);
-        const response = await fetch(endpoint.href, { credentials: 'omit', cache: 'no-store' });
-        if (response.ok) {
-          const result = await response.json();
-          const category = typeof result.category === 'string' ? result.category.trim() : '';
-          if (result.blocked === true && category && enabledCategories.has(category.toLowerCase())) {
-            restriction = {
-              category,
-              reason: typeof result.reason === 'string' ? result.reason.slice(0, 240) : 'The organisation’s category lookup service restricted this domain.'
-            };
-          }
+        const result = await chrome.runtime.sendMessage({ type: 'CATEGORY_LOOKUP', domain: location.hostname });
+        const category = typeof result?.category === 'string' ? result.category.trim() : '';
+        if (result?.blocked === true && category && enabledCategories.has(category.toLowerCase())) {
+          restriction = {
+            category,
+            reason: typeof result.reason === 'string' && result.reason.trim()
+              ? result.reason.slice(0, 240)
+              : 'The organisation’s category lookup service restricted this domain.'
+          };
         }
       }
     } catch (_) {
