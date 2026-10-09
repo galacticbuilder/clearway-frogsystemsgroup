@@ -1,0 +1,14 @@
+Windows Registry Editor Version 5.00
+
+; TEMPLATE ONLY: replace EXTENSION_ID with the actual installed Clearway ID.
+; Chrome: HKLM\Software\Policies\Google\Chrome\3rdparty\extensions\EXTENSION_ID\policy
+; Edge:   HKLM\Software\Policies\Microsoft\Edge\3rdparty\extensions\EXTENSION_ID\policy
+; Apply one browser's path at a time. Use a signed/published extension ID for managed deployment.
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Google\Chrome\3rdparty\extensions\EXTENSION_ID\policy]
+"filteringEnabled"=dword:00000001
+"blockYouTube"=dword:00000001
+"blockGames"=dword:00000001
+"enablePageKeywordBlocking"=dword:00000001
+"blockDomains"=hex(7):2a,00,2e,00,73,00,6f,00,63,00,69,00,61,00,6c,00,2e,00,65,00,78,00,61,00,6d,00,70,00,6c,00,65,00,00,00,65,00,78,00,61,00,6d,00,70,00,6c,00,65,00,2e,00,6f,00,72,00,67,00,00,00,00,00
+"pageKeywords"=hex(7):75,00,6e,00,62,00,6c,00,6f,00,63,00,6b,00,65,00,64,00,20,00,67,00,61,00,6d,00,65,00,73,00,00,00,70,00,6c,00,61,00,79,00,20,00,66,00,72,00,65,00,65,00,20,00,6f,00,6e,00,6c,00,69,00,6e,00,65,00,20,00,67,00,61,00,6d,00,65,00,00,00,00,00
