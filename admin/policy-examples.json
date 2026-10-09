@@ -1,0 +1,25 @@
+{
+  "filteringEnabled": true,
+  "blockYouTube": true,
+  "blockGames": true,
+  "blockDomains": [
+    "*.social.example",
+    "example.org"
+  ],
+  "allowDomains": [
+    "learning.example.org"
+  ],
+  "blockedUrlFilters": [
+    "||youtube.com/shorts/",
+    "||example.com/downloads/"
+  ],
+  "blockedUrlKeywords": [
+    "unblocked-games",
+    "casino"
+  ],
+  "enablePageKeywordBlocking": true,
+  "pageKeywords": [
+    "unblocked games",
+    "play free online game"
+  ]
+}
