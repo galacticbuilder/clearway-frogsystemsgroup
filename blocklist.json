@@ -1,6 +1,11 @@
 {
   "schemaVersion": 1,
-  "version": "2026.10.09.1",
-  "updatedAt": "2026-10-09T00:00:00Z",
-  "domains": []
+  "version": "2026.10.09.2-demo",
+  "updatedAt": "2026-10-09T18:00:00Z",
+  "domains": [
+    "example.com",
+    "roblox.com",
+    "poki.com",
+    "crazygames.com"
+  ]
 }
