@@ -1,7 +1,7 @@
 'use strict';
 
-// Best-effort content classification, not a security boundary. A gateway or
-// managed DNS filter is needed for robust school-wide category enforcement.
+// Page-level category/API checks are best-effort after navigation. They are not
+// a substitute for DNS/gateway enforcement, because the page can begin loading first.
 (async function clearwayPageFilter() {
   if (window.top !== window) return;
 
@@ -11,37 +11,63 @@
   try { local = await chrome.storage.local.get(['clearwayEnabled']); } catch (_) {}
 
   if (managed.filteringEnabled === false ||
-      (typeof managed.filteringEnabled !== 'boolean' && local.clearwayEnabled === false) ||
-      managed.enablePageKeywordBlocking !== true) return;
+      (typeof managed.filteringEnabled !== 'boolean' && local.clearwayEnabled === false)) return;
 
   const enabledCategories = new Set((Array.isArray(managed.enabledCategories) ? managed.enabledCategories : [])
     .filter((value) => typeof value === 'string')
     .map((value) => value.trim().toLowerCase()));
 
-  const terms = Array.isArray(managed.pageKeywords)
-    ? managed.pageKeywords.filter((x) => typeof x === 'string' && x.trim()).map((x) => x.trim().toLocaleLowerCase())
-    : [];
-  const categoryEntries = Array.isArray(managed.categoryKeywords) ? managed.categoryKeywords : [];
-  for (const entry of categoryEntries) {
-    if (typeof entry !== 'string') continue;
-    const separator = entry.indexOf('|');
-    if (separator < 1) continue;
-    const category = entry.slice(0, separator).trim().toLowerCase();
-    const term = entry.slice(separator + 1).trim().toLocaleLowerCase();
-    if (enabledCategories.has(category) && term.length >= 3) terms.push(term);
+  let restriction = null;
+  const apiEndpoint = typeof managed.categoryLookupApiUrl === 'string' ? managed.categoryLookupApiUrl.trim() : '';
+  if (apiEndpoint && enabledCategories.size) {
+    try {
+      const endpoint = new URL(apiEndpoint);
+      if (endpoint.protocol === 'https:') {
+        endpoint.searchParams.set('domain', location.hostname);
+        const response = await fetch(endpoint.href, { credentials: 'omit', cache: 'no-store' });
+        if (response.ok) {
+          const result = await response.json();
+          const category = typeof result.category === 'string' ? result.category.trim() : '';
+          if (result.blocked === true && category && enabledCategories.has(category.toLowerCase())) {
+            restriction = {
+              category,
+              reason: typeof result.reason === 'string' ? result.reason.slice(0, 240) : 'The organisation’s category lookup service restricted this domain.'
+            };
+          }
+        }
+      }
+    } catch (_) {
+      // Fail open if the configured lookup service is unavailable.
+    }
   }
-  const uniqueTerms = [...new Set(terms)].slice(0, 200);
-  if (!uniqueTerms.length) return;
 
-  const pageText = [
-    document.title || '',
-    location.href || '',
-    ...Array.from(document.querySelectorAll('h1,h2,h3,[role="heading"]')).slice(0, 40).map((node) => node.innerText || ''),
-    (document.body?.innerText || '').slice(0, 5000)
-  ].join('\n').toLocaleLowerCase();
+  if (!restriction && managed.enablePageKeywordBlocking === true) {
+    const terms = Array.isArray(managed.pageKeywords)
+      ? managed.pageKeywords.filter((x) => typeof x === 'string' && x.trim()).map((x) => x.trim().toLocaleLowerCase())
+      : [];
+    const categoryEntries = Array.isArray(managed.categoryKeywords) ? managed.categoryKeywords : [];
+    for (const entry of categoryEntries) {
+      if (typeof entry !== 'string') continue;
+      const separator = entry.indexOf('|');
+      if (separator < 1) continue;
+      const category = entry.slice(0, separator).trim().toLowerCase();
+      const term = entry.slice(separator + 1).trim().toLocaleLowerCase();
+      if (enabledCategories.has(category) && term.length >= 3) terms.push(term);
+    }
+    const uniqueTerms = [...new Set(terms)].slice(0, 200);
+    if (uniqueTerms.length) {
+      const pageText = [
+        document.title || '',
+        location.href || '',
+        ...Array.from(document.querySelectorAll('h1,h2,h3,[role="heading"]')).slice(0, 40).map((node) => node.innerText || ''),
+        (document.body?.innerText || '').slice(0, 5000)
+      ].join('\n').toLocaleLowerCase();
+      const matched = uniqueTerms.find((term) => pageText.includes(term));
+      if (matched) restriction = { category: 'Keyword rule', reason: 'This page matched a keyword configured by your organisation.' };
+    }
+  }
 
-  const matched = uniqueTerms.find((term) => pageText.includes(term));
-  if (!matched || document.getElementById('clearway-page-restriction')) return;
+  if (!restriction || document.getElementById('clearway-page-restriction')) return;
 
   const overlay = document.createElement('div');
   overlay.id = 'clearway-page-restriction';
@@ -67,15 +93,19 @@
 
   const heading = document.createElement('h1');
   heading.id = 'clearway-title';
-  heading.textContent = 'This page may be restricted';
+  heading.textContent = 'This page has been restricted';
   Object.assign(heading.style, { fontSize: '28px', lineHeight: '1.2', margin: '0 0 12px', color: '#18352a' });
 
+  const detail = document.createElement('p');
+  detail.textContent = 'Category: ' + restriction.category;
+  Object.assign(detail.style, { fontSize: '13px', fontWeight: '700', color: '#315e4b' });
+
   const description = document.createElement('p');
-  description.textContent = 'ClearWay matched page text against a keyword in your organisation’s enabled filtering policy.';
+  description.textContent = restriction.reason;
   Object.assign(description.style, { fontSize: '15px', lineHeight: '1.6', color: '#52645a' });
 
   const note = document.createElement('p');
-  note.textContent = 'Keyword matching can make mistakes. If this page is needed for learning, ask your teacher or IT support team to review the restriction.';
+  note.textContent = 'If this page is needed for learning, ask your teacher or IT support team to review the restriction.';
   Object.assign(note.style, { fontSize: '13px', lineHeight: '1.6', color: '#52645a' });
 
   const back = document.createElement('button');
@@ -84,7 +114,7 @@
   Object.assign(back.style, { border: '0', borderRadius: '5px', background: '#155d48', color: '#fff', padding: '12px 18px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' });
   back.addEventListener('click', () => history.length > 1 ? history.back() : overlay.remove());
 
-  card.append(brand, heading, description, note, back);
+  card.append(brand, heading, detail, description, note, back);
   overlay.append(card);
   document.documentElement.append(overlay);
 })();
