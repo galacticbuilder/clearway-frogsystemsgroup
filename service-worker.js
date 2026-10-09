@@ -5,13 +5,14 @@ const REFRESH_ALARM = 'clearway-blocklist-refresh';
 const RULE_ID_DOMAIN = 1000;
 const RULE_ID_URL = 10000;
 const RULE_ID_KEYWORD = 16000;
+const RULE_ID_YOUTUBE = 18000;
 const RULE_ID_ALLOW = 22000;
 const MAX_DOMAINS = 3000;
 const MAX_URL_FILTERS = 1000;
 const MAX_KEYWORDS = 500;
 const BLOCKED_PAGE = 'blocked.html';
 const GAME_DOMAINS = ['roblox.com', 'poki.com', 'crazygames.com'];
-const YOUTUBE_DOMAINS = ['youtube.com'];
+const YOUTUBE_DOMAINS = ['youtube.com', 'youtu.be', 'youtube-nocookie.com'];
 
 const NON_DOCUMENT_TYPES = [
   'sub_frame', 'stylesheet', 'script', 'image', 'font', 'object',
@@ -114,17 +115,87 @@ function keywordFilters(keywords) {
     .map((item) => '*' + item + '*'))];
 }
 
+async function getCategoryDomains(policy) {
+  const enabled = new Set((Array.isArray(policy.enabledCategories) ? policy.enabledCategories : [])
+    .filter((value) => typeof value === 'string')
+    .map((value) => value.trim().toLowerCase())
+    .filter(Boolean));
+  const feeds = Array.isArray(policy.categoryFeedUrls) ? policy.categoryFeedUrls.slice(0, 10) : [];
+  const domains = new Set();
+  for (const feedUrl of feeds) {
+    if (typeof feedUrl !== 'string') continue;
+    let parsed;
+    try { parsed = new URL(feedUrl); } catch (_) { continue; }
+    if (parsed.protocol !== 'https:') continue;
+    try {
+      const response = await fetch(parsed.href, { cache: 'no-store', credentials: 'omit' });
+      if (!response.ok) continue;
+      const payload = await response.json();
+      if (!payload || payload.schemaVersion !== 1 || !payload.categories || typeof payload.categories !== 'object') continue;
+      for (const [categoryName, entries] of Object.entries(payload.categories)) {
+        if (!enabled.has(categoryName.toLowerCase()) || !Array.isArray(entries)) continue;
+        for (const entry of entries.slice(0, MAX_DOMAINS)) {
+          try { domains.add(normaliseDomain(entry)); } catch (_) {}
+          if (domains.size >= MAX_DOMAINS) return [...domains];
+        }
+      }
+    } catch (_) {
+      // A single unavailable category source must not prevent local and school rules applying.
+    }
+  }
+  return [...domains];
+}
+
+function youtubeVideoRules(videoIds) {
+  const rules = [];
+  const ids = [...new Set((Array.isArray(videoIds) ? videoIds : [])
+    .filter((id) => typeof id === 'string')
+    .map((id) => id.trim())
+    .filter((id) => /^[A-Za-z0-9_-]{6,20}$/.test(id)))].slice(0, 400);
+  ids.forEach((id, index) => {
+    const patterns = ['*youtube.com/watch?v=' + id + '*', '*youtube.com/shorts/' + id + '*', '*youtu.be/' + id + '*'];
+    patterns.forEach((pattern, patternIndex) => {
+      rules.push({
+        id: RULE_ID_YOUTUBE + index * 6 + patternIndex * 2,
+        priority: 5,
+        action: { type: 'redirect', redirect: { extensionPath: '/' + BLOCKED_PAGE } },
+        condition: { urlFilter: pattern, resourceTypes: ['main_frame'] }
+      });
+      rules.push({
+        id: RULE_ID_YOUTUBE + index * 6 + patternIndex * 2 + 1,
+        priority: 4,
+        action: { type: 'block' },
+        condition: { urlFilter: pattern, resourceTypes: NON_DOCUMENT_TYPES }
+      });
+    });
+  });
+  return rules;
+}
+
 async function installRules(blocklist, policy) {
   const existing = await chrome.declarativeNetRequest.getDynamicRules();
   const enabled = policy.filteringEnabled !== false && policy.__enabled !== false;
   const rules = [];
 
   if (enabled) {
-    // Administrator-defined rules take precedence if the central list is at its size limit.
-    const blockedDomains = new Set(normaliseDomainList(policy.blockDomains || []));
-    if (policy.blockYouTube === true) YOUTUBE_DOMAINS.forEach((domain) => blockedDomains.add(domain));
+    // Each managed organisation can have its own categories and lists. The shared
+    // demo list is used only when no organisation-specific policy is configured.
+    const organisationPolicyConfigured = Boolean(
+      policy.organizationName ||
+      (Array.isArray(policy.enabledCategories) && policy.enabledCategories.length) ||
+      (Array.isArray(policy.categoryFeedUrls) && policy.categoryFeedUrls.length) ||
+      (Array.isArray(policy.blacklistDomains) && policy.blacklistDomains.length) ||
+      (Array.isArray(policy.whitelistDomains) && policy.whitelistDomains.length)
+    );
+    const blockedDomains = new Set([
+      ...normaliseDomainList(policy.blockDomains || []),
+      ...normaliseDomainList(policy.blacklistDomains || [])
+    ]);
+    const categoryDomains = await getCategoryDomains(policy);
+    categoryDomains.forEach((domain) => blockedDomains.add(domain));
+    if (policy.blockYouTube === true || policy.blockYouTubeEntirely === true) YOUTUBE_DOMAINS.forEach((domain) => blockedDomains.add(domain));
     if (policy.blockGames === true) GAME_DOMAINS.forEach((domain) => blockedDomains.add(domain));
-    blocklist.domains.forEach((domain) => blockedDomains.add(domain));
+    if (!organisationPolicyConfigured) blocklist.domains.forEach((domain) => blockedDomains.add(domain));
 
     [...blockedDomains].slice(0, MAX_DOMAINS).forEach((domain, index) => {
       const base = RULE_ID_DOMAIN + index * 2;
@@ -142,9 +213,19 @@ async function installRules(blocklist, policy) {
     });
 
     rules.push(...urlFilterRules(Array.isArray(policy.blockedUrlFilters) ? policy.blockedUrlFilters : [], RULE_ID_URL));
-    rules.push(...urlFilterRules(keywordFilters(policy.blockedUrlKeywords), RULE_ID_KEYWORD));
+    const keywords = [
+      ...(Array.isArray(policy.blockedUrlKeywords) ? policy.blockedUrlKeywords : []),
+      ...(Array.isArray(policy.blockedKeywords) ? policy.blockedKeywords : [])
+    ];
+    rules.push(...urlFilterRules(keywordFilters(keywords), RULE_ID_KEYWORD));
+    if (policy.blockYouTubeEntirely !== true && policy.blockYouTube !== true) {
+      rules.push(...youtubeVideoRules(policy.blockedYouTubeVideoIds));
+    }
 
-    const allowDomains = normaliseDomainList(policy.allowDomains || [], 1000);
+    const allowDomains = normaliseDomainList([
+      ...(Array.isArray(policy.allowDomains) ? policy.allowDomains : []),
+      ...(Array.isArray(policy.whitelistDomains) ? policy.whitelistDomains : [])
+    ], 1000);
     allowDomains.forEach((domain, index) => {
       rules.push({
         id: RULE_ID_ALLOW + index, priority: 100,
