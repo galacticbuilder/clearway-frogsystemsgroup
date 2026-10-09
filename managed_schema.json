@@ -1,0 +1,66 @@
+{
+  "type": "object",
+  "properties": {
+    "filteringEnabled": {
+      "type": "boolean",
+      "title": "Enable Clearway filtering",
+      "description": "When false, Clearway does not install block rules."
+    },
+    "blockYouTube": {
+      "type": "boolean",
+      "title": "Block YouTube",
+      "description": "Block youtube.com and its subdomains."
+    },
+    "blockGames": {
+      "type": "boolean",
+      "title": "Block example game sites",
+      "description": "Block Roblox, Poki and CrazyGames."
+    },
+    "blockDomains": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Additional blocked domains",
+      "description": "DNS names such as example.org or *.example.org."
+    },
+    "allowDomains": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Allowed domains",
+      "description": "Domains exempted from Clearway domain and URL rules."
+    },
+    "blockedUrlFilters": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Blocked URL filters",
+      "description": "Declarative Net Request urlFilter expressions; see admin guide."
+    },
+    "blockedUrlKeywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Blocked URL keywords",
+      "description": "Words matched anywhere in the URL, not the visible page text."
+    },
+    "enablePageKeywordBlocking": {
+      "type": "boolean",
+      "title": "Enable page text keyword blocking",
+      "description": "Enable best-effort DOM inspection and a local overlay."
+    },
+    "pageKeywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Blocked page text keywords",
+      "description": "Text checked in page title, headings and an initial body text sample."
+    }
+  },
+  "additionalProperties": false
+}
