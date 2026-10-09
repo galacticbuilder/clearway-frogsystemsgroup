@@ -131,6 +131,11 @@
       },
       "title": "Category-specific page keywords",
       "description": "Entries formatted category|keyword; applied only when that category is enabled."
+    },
+    "categoryLookupApiUrl": {
+      "type": "string",
+      "title": "Category lookup API URL",
+      "description": "Optional HTTPS endpoint checked after a page loads; receives only the hostname as a domain query parameter."
     }
   }
 }
