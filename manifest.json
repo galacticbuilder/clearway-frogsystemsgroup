@@ -19,10 +19,5 @@
   "action": {
     "default_title": "Clearway filtering status",
     "default_popup": "popup.html"
-  },
-  "icons": {
-    "16": "icons/clearway-16.png",
-    "48": "icons/clearway-48.png",
-    "128": "icons/clearway-128.png"
   }
 }
