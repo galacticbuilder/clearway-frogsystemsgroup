@@ -13,7 +13,7 @@ Clearway is a Chromium Manifest V3 extension for Google Chrome and Microsoft Edg
 - Top-level navigation to blocked domains is redirected to a local Clearway restriction page.
 - Subresource requests to blocked domains are blocked by the browser.
 - Popup shows filtering status and the last successful update.
-- No browsing history or page content is sent to FrogSystems Group.
+- ClearWay does not send browsing history or page content to FrogSystems Group by default. If an organisation configures a category lookup API, ClearWay sends the visited hostname to that organisation-configured endpoint after navigation begins.
 
 ## Load locally
 
