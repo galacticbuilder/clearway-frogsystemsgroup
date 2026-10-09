@@ -60,6 +60,69 @@
       },
       "title": "Blocked page text keywords",
       "description": "Text checked in page title, headings and an initial body text sample."
+    },
+    "organizationName": {
+      "type": "string",
+      "title": "Organisation name",
+      "description": "Name shown on the ClearWay restriction page."
+    },
+    "supportUrl": {
+      "type": "string",
+      "title": "IT support URL",
+      "description": "HTTPS or HTTP helpdesk link shown on the restriction page."
+    },
+    "enabledCategories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Enabled filtering categories",
+      "description": "Category names enabled for this organisation; matched against category feed names."
+    },
+    "categoryFeedUrls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Category list feed URLs",
+      "description": "HTTPS JSON feeds with a categories object mapping category names to domain arrays."
+    },
+    "blacklistDomains": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Organisation blacklist",
+      "description": "Domains blocked specifically by this organisation."
+    },
+    "whitelistDomains": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Organisation whitelist",
+      "description": "Domains allowed by this organisation; takes priority over domain rules."
+    },
+    "blockedKeywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Organisation URL keywords",
+      "description": "Keywords matched in URLs for this organisation."
+    },
+    "blockYouTubeEntirely": {
+      "type": "boolean",
+      "title": "Block YouTube entirely",
+      "description": "Blocks YouTube as a separate control; use video IDs for selective blocking instead."
+    },
+    "blockedYouTubeVideoIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Blocked YouTube video IDs",
+      "description": "Blocks specific YouTube videos by video ID, including watch, shorts and youtu.be URLs."
     }
   }
 }
