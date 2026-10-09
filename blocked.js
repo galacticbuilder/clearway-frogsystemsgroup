@@ -42,19 +42,21 @@ if (supportUrl) {
   supportLink.hidden = false;
 }
 
-try {
-  const policy = await chrome.storage.managed.get(['organizationName', 'supportUrl']);
-  if (!orgName && typeof policy.organizationName === 'string' && policy.organizationName.trim()) {
-    organisation.textContent = policy.organizationName.trim().slice(0, 120) + ' · ClearWay by FrogSystems Group';
-  }
-  if (!supportUrl) {
-    const managedSupport = safeHttpUrl(policy.supportUrl || '');
-    if (managedSupport) {
-      supportLink.href = managedSupport.href;
-      supportLink.hidden = false;
+(async function applyManagedBranding() {
+  try {
+    const policy = await chrome.storage.managed.get(['organizationName', 'supportUrl']);
+    if (!orgName && typeof policy.organizationName === 'string' && policy.organizationName.trim()) {
+      organisation.textContent = policy.organizationName.trim().slice(0, 120) + ' · ClearWay by FrogSystems Group';
     }
-  }
-} catch (_) {}
+    if (!supportUrl) {
+      const managedSupport = safeHttpUrl(policy.supportUrl || '');
+      if (managedSupport) {
+        supportLink.href = managedSupport.href;
+        supportLink.hidden = false;
+      }
+    }
+  } catch (_) {}
+})();
 
 document.getElementById('back-button').addEventListener('click', () => {
   if (history.length > 1) {
