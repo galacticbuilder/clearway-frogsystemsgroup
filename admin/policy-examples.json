@@ -1,25 +1,41 @@
 {
   "filteringEnabled": true,
-  "blockYouTube": true,
-  "blockGames": true,
-  "blockDomains": [
-    "*.social.example",
-    "example.org"
+  "organizationName": "Example School",
+  "supportUrl": "https://support.example.edu/clearway",
+  "enabledCategories": [
+    "games",
+    "social-media",
+    "gambling"
   ],
-  "allowDomains": [
-    "learning.example.org"
+  "categoryFeedUrls": [
+    "https://filtering.example.edu/clearway/categories.json"
   ],
-  "blockedUrlFilters": [
-    "||youtube.com/shorts/",
-    "||example.com/downloads/"
+  "blacklistDomains": [
+    "example.org",
+    "*.unapproved.example.edu"
   ],
-  "blockedUrlKeywords": [
+  "whitelistDomains": [
+    "learning.example.edu",
+    "example.com"
+  ],
+  "blockedKeywords": [
     "unblocked-games",
     "casino"
   ],
+  "blockedUrlFilters": [
+    "||example.com/downloads/"
+  ],
   "enablePageKeywordBlocking": true,
   "pageKeywords": [
-    "unblocked games",
-    "play free online game"
+    "unblocked games"
+  ],
+  "categoryKeywords": [
+    "games|play free online game",
+    "gambling|bet now",
+    "social-media|follow me"
+  ],
+  "blockYouTubeEntirely": false,
+  "blockedYouTubeVideoIds": [
+    "EXAMPLE_ID_123"
   ]
 }
